@@ -26,6 +26,8 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
+    print("Got the parameters")
     mav_connection = mavutil.mavlink_connection(args.connect)
+    print("Connected to the drone")
     result = arm(mav_connection, args.arm)
     print(f'Result of arm/disarm command: {result}')
