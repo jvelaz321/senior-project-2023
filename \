@@ -1,0 +1,4 @@
+enable_uart=1
+init_uart_baud=115200
+dtoverlay=disable-bt
+dtoverlay=pi3-miniuart-bt

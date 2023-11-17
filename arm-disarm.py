@@ -42,7 +42,7 @@ def setMode(mode, master):
 #  You can check in http:192.168.1.2:2770/mavproxy that the communication made for 9000
 #  uses a 'udp' (server) and not 'udpout' (client).
 # master = mavutil.mavlink_connection('udpout:0.0.0.0:9000')
-the_connection = mavutil.mavlink_connection('udpin:localhost:14550')
+the_connection = mavutil.mavlink_connection('/dev/ttyTHS1', baud=921600)
 
 # Wait for the first heartbeat
 # We also set the system id of remote system for the link
