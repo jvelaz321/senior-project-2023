@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 import asyncio
 from mavsdk import System
 
@@ -7,7 +5,8 @@ from mavsdk import System
 async def run():
 
     drone = System() # Start the mav server
-    await drone.connect(system_address="udp://:14550") # Connect to the drone
+    print("Connecting to drone")
+    await drone.connect(system_address="udp://:14551") # Connect to the drone
 
     status_text_task = asyncio.ensure_future(print_status_text(drone))
 
@@ -25,7 +24,7 @@ async def run():
 
     print("-- Arming")
     await drone.action.arm()
-
+    await asyncio.sleep(2)
     print("-- Taking off")
     await drone.action.takeoff()
 
