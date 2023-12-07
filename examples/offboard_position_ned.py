@@ -13,11 +13,12 @@ import asyncio
 from mavsdk import System
 from mavsdk.offboard import (OffboardError, PositionNedYaw)
 
+
 async def run():
     """ Does Offboard control using position NED coordinates. """
 
     drone = System()
-    await drone.connect(system_address="udp://:14551")
+    await drone.connect(system_address="udp://:14550")
 
     print("Waiting for drone to connect...")
     async for state in drone.core.connection_state():
@@ -50,25 +51,25 @@ async def run():
     print("-- Go 0m North, 0m East, -5m Down \
             within local coordinate system")
     await drone.offboard.set_position_ned(
-        PositionNedYaw(0.0, 0.0, -5.0, 0.0))
-    # await asyncio.sleep(10)
+            PositionNedYaw(0.0, 0.0, -5.0, 0.0))
+    await asyncio.sleep(10)
 
     print("-- Go 5m North, 0m East, -5m Down \
             within local coordinate system, turn to face East")
     await drone.offboard.set_position_ned(
-        PositionNedYaw(5.0, 0.0, -5.0, 90.0))
-    # await asyncio.sleep(10)
+            PositionNedYaw(5.0, 0.0, -5.0, 90.0))
+    await asyncio.sleep(10)
 
     print("-- Go 5m North, 10m East, -5m Down \
             within local coordinate system")
     await drone.offboard.set_position_ned(
-        PositionNedYaw(5.0, 10.0, -5.0, 90.0))
-    # await asyncio.sleep(15)
+            PositionNedYaw(5.0, 10.0, -5.0, 90.0))
+    await asyncio.sleep(15)
 
     print("-- Go 0m North, 10m East, 0m Down \
             within local coordinate system, turn to face South")
     await drone.offboard.set_position_ned(
-        PositionNedYaw(0.0, 10.0, 0.0, 180.0))
+            PositionNedYaw(0.0, 10.0, 0.0, 180.0))
     await asyncio.sleep(10)
 
     print("-- Stopping offboard")

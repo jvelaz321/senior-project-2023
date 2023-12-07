@@ -15,6 +15,8 @@ def convert_to_distance_vectors(position_data):
 
       # Calculate the differences between consecutive coordinates
       difference = end - start
+      difference[-1] = -difference[-1]
+      difference = difference * 100
       ned_coords.append(difference.tolist())
 
 
@@ -45,4 +47,4 @@ position_data = [[0., 0., 0.], [0., 0., 0.], [-0.00100903, -0.0015942, 0.0023528
                  [0.01804652, -0.04677423, 0.89783746], [0.01574918, -0.05234253, 0.93586993]]
 
 distance_vector = convert_to_distance_vectors(position_data)
-print("Distance Vector (north_m, east_m, down_m):", distance_vector)
+print(distance_vector)
