@@ -74,7 +74,12 @@ echo 'export GZ_SIM_SYSTEM_PLUGIN_PATH=$HOME/gz_ws/src/ardupilot_gazebo/build:${
 echo 'export GZ_SIM_RESOURCE_PATH=$HOME/gz_ws/src/ardupilot_gazebo/models:$HOME/gz_ws/src/ardupilot_gazebo/worlds:${GZ_SIM_RESOURCE_PATH}' >> ~/.bashrc
 ```
 
-Test
+Terminal 1
+```shell
+cd worlds
+gz sim -v4 -r drone_with_lidar.sdf 
+```
+Terminal 2
 ```shell
 sim_vehicle.py -v ArduCopter -f gazebo-iris --model JSON --map --console
 ```
