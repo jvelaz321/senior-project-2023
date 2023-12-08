@@ -1,26 +1,81 @@
+import math
+
 import numpy as np
+
+"""
+Functions to make it easy to convert between the different frames-of-reference. In particular these
+make it easy to navigate in terms of "metres from the current position" when using commands that take 
+absolute positions in decimal degrees.
+
+The methods are approximations only, and may be less accurate over longer distances, and when close 
+to the Earth's poles.
+
+Specifically, it provides:
+* get_location_metres - Get LocationGlobal (decimal degrees) at distance (m) North & East of a given LocationGlobal.
+* get_distance_metres - Get the distance between two LocationGlobal objects in metres
+* get_bearing - Get the bearing in degrees to a LocationGlobal
+"""
+
+
+def get_distance_metres(aLocation1, aLocation2):
+    """
+    Returns the ground distance in metres between two LocationGlobal objects.
+
+    This method is an approximation, and will not be accurate over large distances and close to the
+    earth's poles. It comes from the ArduPilot test code:
+    https://github.com/diydrones/ardupilot/blob/master/Tools/autotest/common.py
+    """
+    dlat = aLocation2.lat - aLocation1.lat
+    dlong = aLocation2.lon - aLocation1.lon
+    return math.sqrt((dlat * dlat) + (dlong * dlong)) * 1.113195e5
+
+
+def get_bearing(aLocation1, aLocation2):
+    """
+    Returns the bearing between the two LocationGlobal objects passed as parameters.
+
+    This method is an approximation, and may not be accurate over large distances and close to the
+    earth's poles. It comes from the ArduPilot test code:
+    https://github.com/diydrones/ardupilot/blob/master/Tools/autotest/common.py
+    """
+    off_x = aLocation2.lon - aLocation1.lon
+    off_y = aLocation2.lat - aLocation1.lat
+    bearing = 90.00 + math.atan2(-off_y, off_x) * 57.2957795
+    if bearing < 0:
+        bearing += 360.00
+    return bearing;
+
+
+def get_new_location(original_location, dNorth, dEast):
+    earth_radius = 6378137.0  # Radius of "spherical" earth
+    # Coordinate offsets in radians
+    dLat = dNorth / earth_radius
+    dLon = dEast / (earth_radius * math.cos(math.pi * original_location.lat / 180))
+
+    return (dLat, dLon)
+
 
 def convert_to_distance_vectors(position_data):
     # Convert the list of coordinates to a numpy array for easier calculations
     ned_coords = []
     for index, position in enumerate(position_data):
-      if index >= len(position_data)-1:
-        continue
-    # Check that there is one more item
-      elif index +1 >= len(position_data)-1:
-        continue
+        if index >= len(position_data) - 1:
+            continue
+        # Check that there is one more item
+        elif index + 1 >= len(position_data) - 1:
+            continue
 
-      start = np.array(position)
-      end = np.array(position_data[index+1])
+        start = np.array(position)
+        end = np.array(position_data[index + 1])
 
-      # Calculate the differences between consecutive coordinates
-      difference = end - start
-      difference[-1] = -difference[-1]
-      difference = difference * 100
-      ned_coords.append(difference.tolist())
-
+        # Calculate the differences between consecutive coordinates
+        difference = end - start
+        difference[-1] = -difference[-1]
+        difference = difference * 100
+        ned_coords.append(difference.tolist())
 
     return ned_coords
+
 
 # Example usage
 position_data = [[0., 0., 0.], [0., 0., 0.], [-0.00100903, -0.0015942, 0.00235286],

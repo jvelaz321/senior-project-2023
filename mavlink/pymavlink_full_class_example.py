@@ -58,7 +58,6 @@ import datetime
 
 __license__ = "GPLv3}"
 
-
 class ErrorException(Exception):
     """Base class for other exceptions"""
     pass
@@ -1294,32 +1293,6 @@ Also, ignores heartbeats not from our target system"""
         wp2._header.srcComponent = wp.get_srcComponent()
         return wp2
 
-    # def goto_position_target_local_ned(self, north, east, down):
-    #     """
-    #     Send SET_POSITION_TARGET_LOCAL_NED command to request the vehicle fly to a specified
-    #     location in the North, East, Down frame.
-    #
-    #     It is important to remember that in this frame, positive altitudes are entered as negative
-    #     "Down" values. So if down is "10", this will be 10 metres below the home altitude.
-    #
-    #     Starting from AC3.3 the method respects the frame setting. Prior to that the frame was
-    #     ignored. For more information see:
-    #     http://dev.ardupilot.com/wiki/copter-commands-in-guided-mode/#set_position_target_local_ned
-    #
-    #     See the above link for information on the type_mask (0=enable, 1=ignore).
-    #     At time of writing, acceleration and yaw bits are ignored.
-    #
-    #     """
-    #
-    #     msg = self.mav.set_position_target_local_ned_encode(
-    #         0,  # time_boot_ms (not used)
-    #         0, 0,  # target system, target component
-    #         mavutil.mavlink.MAV_FRAME_LOCAL_NED,  # frame
-    #         0b0000111111111000,  # type_mask (only positions enabled)
-    #         north, east, down,  # x, y, z positions (or North, East, Down in the MAV_FRAME_BODY_NED frame
-    #         0, 0, 0,  # x, y, z velocity in m/s  (not used)
-    #         0, 0, 0,  # x, y, z acceleration (not supported yet, ignored in GCS_Mavlink)
-    #         0, 0)  # yaw, yaw_rate (not supported yet, ignored in GCS_Mavlink)
     def init_wp(self):
         last_home = self.home_position_as_mav_location()
         self.wploader.clear()
@@ -1353,19 +1326,6 @@ Also, ignores heartbeats not from our target system"""
     ########################################################################################################################
     # Command functions ####################################################################################################
     ########################################################################################################################
-    def move_ned(self, north, east, down):
-        self.mav.mav.local_position_send(mavutil.mavlink.SET_POSITION_TARGET_LOCAL_NED,
-                     0,  # time_boot_ms (not used)
-                     0, 0,  # target system, target component
-                     mavutil.mavlink.MAV_FRAME_LOCAL_NED,  # frame
-                     0b0000111111111000,  # type_mask (only positions enabled)
-                     north, east, down,  # x, y, z positions (or North, East, Down in the MAV_FRAME_BODY_NED frame
-                     0, 0, 0,  # x, y, z velocity in m/s  (not used)
-                     0, 0, 0,  # x, y, z acceleration (not supported yet, ignored in GCS_Mavlink)
-                     0, 0)  # yaw, yaw_rate (not supported yet, ignored in GCS_Mavlink)
-        # self.mav.SET_POSITION_TARGET_LOCAL_NED(
-
-
     def user_takeoff(self, alt_min=30):
         """takeoff using mavlink takeoff command"""
         self.run_cmd(mavutil.mavlink.MAV_CMD_NAV_TAKEOFF,
@@ -1527,48 +1487,6 @@ def big_print(text):
     print("########## %s  ##########" % text)
     print("##################################################################################")
 
-coordinates = [[-0.10090299999999999, -0.15942, -0.235286],
-               [-0.10074000000000001, -0.158939, -0.333386], [-0.09995400000000002, -0.15749700000000003, -0.431479],
-               [-0.09825999999999997, -0.15498299999999995, -0.529555],
-               [-0.09524399999999997, -0.151177, -0.6275959999999999],
-               [-0.09070800000000002, -0.14604200000000006, -0.7255750000000002],
-               [-0.08433500000000005, -0.13959899999999997, -0.8234660000000001],
-               [-0.076047, -0.13184400000000007, -0.9212379999999999],
-               [-0.06604100000000002, -0.123118, -1.0131149999999998],
-               [-0.05363599999999996, -0.11302399999999993, -1.1105629999999997],
-               [-0.03994900000000006, -0.10261200000000001, -1.196387],
-               [-0.024808999999999942, -0.09139299999999986, -1.2804220000000006],
-               [-0.007278999999999966, -0.07849300000000031, -1.3773119999999999],
-               [0.010761999999999924, -0.06545299999999969, -1.4691469999999998],
-               [0.029642000000000036, -0.05210300000000022, -1.5598340000000002],
-               [0.04971899999999998, -0.037972999999999826, -1.6563930000000004],
-               [0.06839000000000003, -0.02514300000000004, -1.7357999999999985],
-               [0.08881499999999999, -0.011567999999999995, -1.8323630000000009],
-               [0.10699600000000001, 2.9999999998087112e-06, -1.9116880000000003],
-               [0.126011, 0.01160200000000014, -2.0085169999999986],
-               [0.14364200000000002, 0.021805000000000088, -2.1055550000000007],
-               [0.159576, 0.030092999999999787, -2.2028360000000022],
-               [0.173458812, 0.03602959999999995, -2.3003479999999965],
-               [0.18520918800000002, 0.039097400000000226, -2.3970760000000038],
-               [0.19455400000000003, 0.03894499999999995, -2.4949489999999965],
-               [0.20104499999999995, 0.03531100000000002, -2.5929140000000017],
-               [0.20436199999999993, 0.028034999999999866, -2.69085],
-               [0.20441, 0.016856000000000163, -2.7857269999999987],
-               [0.20106200000000013, 0.0018749999999997935, -2.876182999999999],
-               [0.19383199999999987, -0.01808399999999981, -2.9731300000000016],
-               [0.18343400000000004, -0.04064299999999993, -3.0550599999999983],
-               [0.16890399999999994, -0.06777100000000015, -3.139404000000001],
-               [0.14973799999999995, -0.1000789999999998, -3.2289360000000045],
-               [0.1272910000000002, -0.13509100000000002, -3.309812999999995],
-               [0.10173599999999984, -0.17229200000000028, -3.3816640000000064],
-               [0.0685810000000002, -0.2179579999999997, -3.4712429999999905],
-               [0.03378300000000008, -0.26328500000000027, -3.5432300000000083],
-               [-0.003227000000000091, -0.3092519999999998, -3.6038860000000006],
-               [-0.0437110000000001, -0.35741599999999996, -3.6595839999999935],
-               [-0.08260799999999999, -0.4019189999999999, -3.693495000000002],
-               [-0.1292249999999998, -0.45305100000000015, -3.737394999999999],
-               [-0.17362500000000017, -0.4998530000000001, -3.7613459999999987]]
-
 
 def main():
     big_print("Welcome in pymavlink Copter example!")
@@ -1593,105 +1511,111 @@ def main():
     print("MAVLINK_MSG_ID_POSITION_TARGET_GLOBAL_INT rate : %f" % copter.send_get_message_interval(
         ardupilotmega.MAVLINK_MSG_ID_POSITION_TARGET_GLOBAL_INT))
 
-    # big_print("Let's create and write a mission")
+    big_print("Let's change some parameters")
+    print("RTL_ALT value %f" % copter.get_parameter("RTL_ALT"))
+    copter.set_parameters({"RTL_ALT": 2000})
+    print("RTL_ALT value %f" % copter.get_parameter("RTL_ALT"))
+
+    big_print("Let's create and write a mission")
     # We will write manually a mission by defining some waypoint
     # We start by initialising mavwp helper library
-    # copter.init_wp()
+    copter.init_wp()
     # We get the home position to serve as reference for the mission and as waypoint 0.
     last_home = copter.home_position_as_mav_location()
     # On Copter, we need a takeoff ... for takeoff !
+    copter.add_wp_takeoff(last_home.lat, last_home.lng, 10)
+    copter.add_waypoint(last_home.lat + 0.0005, last_home.lng + 0.0005, 20)
+    copter.add_waypoint(last_home.lat - 0.0005, last_home.lng + 0.0005, 30)
+    copter.add_waypoint(last_home.lat - 0.0005, last_home.lng - 0.0005, 20)
+    copter.add_waypoint(last_home.lat + 0.0005, last_home.lng - 0.0005, 15)
+    # We add a RTL at the end.
+    copter.add_wp_rtl()
+    # We send everything to the drone
+    copter.send_all_waypoints()
 
-    # copter.add_wp_takeoff(last_home.lat, last_home.lng, coordinates[0][2])
-    # for coord in coordinates:
-    #     copter.add_waypoint(last_home.lat + coord[0], last_home.lng + coord[1], coord[2])
-    # # We add a RTL at the end.
-    # copter.add_wp_rtl()
-    # # We send everything to the drone
-    # copter.send_all_waypoints()
-    #
-    # big_print("Let's get the mission written")
-    # # We get the number of mission waypoint in the drone and print the mission
-    # wp_count = copter.get_all_waypoints()
-    #
-    # big_print("Let's execute the mission")
-    # # On ArduPilot, with copter < 4.1 we need to arm before going into Auto mode.
-    # # We use GUIDED mode as the requirement are closed to AUTO one's
-    # copter.change_mode("GUIDED")
-    # # We wait that can pass all arming check
-    # copter.wait_ready_to_arm()
-    # copter.arm_vehicle()
-    # # When armed, we change mode to AUTO
-    # copter.change_mode("AUTO")
-    # # As we don't have RC radio here, we trigger mission start with MAVLink.
-    # copter.send_cmd(mavutil.mavlink.MAV_CMD_MISSION_START,
-    #                 1,  # ARM
-    #                 0,
-    #                 0,
-    #                 0,
-    #                 0,
-    #                 0,
-    #                 0,
-    #                 target_sysid=copter.target_system,
-    #                 target_compid=copter.target_system,
-    #                 )
-    # # We use the convenient function to track the mission progression
-    # copter.wait_waypoint(0, wp_count - 1, timeout=500)
-    # copter.wait_landed_and_disarmed(min_alt=2)
+    big_print("Let's get the mission written")
+    # We get the number of mission waypoint in the drone and print the mission
+    wp_count = copter.get_all_waypoints()
 
-    # big_print("Let's do some GUIDED movement")
-    # # We will do some guided command
-    # copter.change_mode("GUIDED")
-    # copter.wait_ready_to_arm()
-    # if not copter.armed():
-    #     copter.arm_vehicle()
-    # # example of mavlink takeoff
-    # copter.user_takeoff(11)
-    # # example of waiting altitude target
-    # copter.wait_altitude(10, 13, True)
-    # # Now we will use a target setpoint
-    # targetpos = copter.mav.location()
-    # wp_accuracy = copter.get_parameter("WPNAV_RADIUS", attempts=2)
-    # wp_accuracy = wp_accuracy * 0.01  # cm to m
-    # targetpos.lat = targetpos.lat + 0.001
-    # targetpos.lng = targetpos.lng + 0.001
-    # targetpos.alt = targetpos.alt + 5
-    # copter.mav.mav.set_position_target_global_int_send(
-    #     0,  # timestamp
-    #     copter.target_system,  # target system_id
-    #     1,  # target component id
-    #     mavutil.mavlink.MAV_FRAME_GLOBAL_INT,
-    #     mavutil.mavlink.POSITION_TARGET_TYPEMASK_VX_IGNORE |
-    #     mavutil.mavlink.POSITION_TARGET_TYPEMASK_VY_IGNORE |
-    #     mavutil.mavlink.POSITION_TARGET_TYPEMASK_VZ_IGNORE |
-    #     mavutil.mavlink.POSITION_TARGET_TYPEMASK_AX_IGNORE |
-    #     mavutil.mavlink.POSITION_TARGET_TYPEMASK_AY_IGNORE |
-    #     mavutil.mavlink.POSITION_TARGET_TYPEMASK_AZ_IGNORE |
-    #     mavutil.mavlink.POSITION_TARGET_TYPEMASK_FORCE_SET |
-    #     mavutil.mavlink.POSITION_TARGET_TYPEMASK_YAW_IGNORE |
-    #     mavutil.mavlink.POSITION_TARGET_TYPEMASK_YAW_RATE_IGNORE,
-    #     int(targetpos.lat * 1.0e7),  # lat
-    #     int(targetpos.lng * 1.0e7),  # lon
-    #     targetpos.alt,  # alt
-    #     0,  # vx
-    #     0,  # vy
-    #     0,  # vz
-    #     0,  # afx
-    #     0,  # afy
-    #     0,  # afz
-    #     0,  # yaw
-    #     0,  # yawrate
-    # )
-    # # Let's control that we are going to the right place
-    # current_target = copter.get_current_target()
-    # while current_target.lat != targetpos.lat and current_target.lng != targetpos.lng and current_target.alt != targetpos.alt:
-    #     current_target = copter.get_current_target()
-    #
-    # # Monitor that we are going to the right place
-    # copter.wait_location(targetpos, accuracy=wp_accuracy, timeout=60,
-    #                      target_altitude=targetpos.alt,
-    #                      height_accuracy=2, minimum_duration=2)
-    # # Get back to home
-    # copter.do_RTL()
+    big_print("Let's execute the mission")
+    # On ArduPilot, with copter < 4.1 we need to arm before going into Auto mode.
+    # We use GUIDED mode as the requirement are closed to AUTO one's
+    copter.change_mode("GUIDED")
+    # We wait that can pass all arming check
+    copter.wait_ready_to_arm()
+    copter.arm_vehicle()
+    # When armed, we change mode to AUTO
+    copter.change_mode("AUTO")
+    # As we don't have RC radio here, we trigger mission start with MAVLink.
+    copter.send_cmd(mavutil.mavlink.MAV_CMD_MISSION_START,
+                    1,  # ARM
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    target_sysid=copter.target_system,
+                    target_compid=copter.target_system,
+                    )
+    # We use the convenient function to track the mission progression
+    copter.wait_waypoint(0, wp_count - 1, timeout=500)
+    copter.wait_landed_and_disarmed(min_alt=2)
+
+    big_print("Let's do some GUIDED movement")
+    # We will do some guided command
+    copter.change_mode("GUIDED")
+    copter.wait_ready_to_arm()
+    if not copter.armed():
+        copter.arm_vehicle()
+    # example of mavlink takeoff
+    copter.user_takeoff(11)
+    # example of waiting altitude target
+    copter.wait_altitude(10, 13, True)
+    # Now we will use a target setpoint
+    targetpos = copter.mav.location()
+    wp_accuracy = copter.get_parameter("WPNAV_RADIUS", attempts=2)
+    wp_accuracy = wp_accuracy * 0.01  # cm to m
+    targetpos.lat = targetpos.lat + 0.001
+    targetpos.lng = targetpos.lng + 0.001
+    targetpos.alt = targetpos.alt + 5
+    copter.mav.mav.set_position_target_global_int_send(
+        0,  # timestamp
+        copter.target_system,  # target system_id
+        1,  # target component id
+        mavutil.mavlink.MAV_FRAME_GLOBAL_INT,
+        mavutil.mavlink.POSITION_TARGET_TYPEMASK_VX_IGNORE |
+        mavutil.mavlink.POSITION_TARGET_TYPEMASK_VY_IGNORE |
+        mavutil.mavlink.POSITION_TARGET_TYPEMASK_VZ_IGNORE |
+        mavutil.mavlink.POSITION_TARGET_TYPEMASK_AX_IGNORE |
+        mavutil.mavlink.POSITION_TARGET_TYPEMASK_AY_IGNORE |
+        mavutil.mavlink.POSITION_TARGET_TYPEMASK_AZ_IGNORE |
+        mavutil.mavlink.POSITION_TARGET_TYPEMASK_FORCE_SET |
+        mavutil.mavlink.POSITION_TARGET_TYPEMASK_YAW_IGNORE |
+        mavutil.mavlink.POSITION_TARGET_TYPEMASK_YAW_RATE_IGNORE,
+        int(targetpos.lat * 1.0e7),  # lat
+        int(targetpos.lng * 1.0e7),  # lon
+        targetpos.alt,  # alt
+        0,  # vx
+        0,  # vy
+        0,  # vz
+        0,  # afx
+        0,  # afy
+        0,  # afz
+        0,  # yaw
+        0,  # yawrate
+    )
+    # Let's control that we are going to the right place
+    current_target = copter.get_current_target()
+    while current_target.lat != targetpos.lat and current_target.lng != targetpos.lng and current_target.alt != targetpos.alt:
+        current_target = copter.get_current_target()
+
+    # Monitor that we are going to the right place
+    copter.wait_location(targetpos, accuracy=wp_accuracy, timeout=60,
+                         target_altitude=targetpos.alt,
+                         height_accuracy=2, minimum_duration=2)
+    # Get back to home
+    copter.do_RTL()
 
 
 if __name__ == "__main__":
