@@ -21,7 +21,7 @@ def arm(mav_connection, arm_command):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Send arm/disarm commands using MAVLink protocol.')
-    parser.add_argument('-c', '--connect', help="Connection string", default='udpin:172.20.240.1:14551')
+    parser.add_argument('-c', '--connect', help="Connection string", default='udpin:localhost:14550')
     parser.add_argument('-a', '--arm', type=int, choices=[0, 1], help="Arm/Disarm command", default=1)
 
     args = parser.parse_args()
