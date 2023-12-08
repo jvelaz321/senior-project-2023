@@ -1354,17 +1354,48 @@ Also, ignores heartbeats not from our target system"""
     # Command functions ####################################################################################################
     ########################################################################################################################
     def move_ned(self, north, east, down):
-        self.mav.mav.local_position_send(mavutil.mavlink.SET_POSITION_TARGET_LOCAL_NED,
-                     0,  # time_boot_ms (not used)
-                     0, 0,  # target system, target component
-                     mavutil.mavlink.MAV_FRAME_LOCAL_NED,  # frame
-                     0b0000111111111000,  # type_mask (only positions enabled)
-                     north, east, down,  # x, y, z positions (or North, East, Down in the MAV_FRAME_BODY_NED frame
-                     0, 0, 0,  # x, y, z velocity in m/s  (not used)
-                     0, 0, 0,  # x, y, z acceleration (not supported yet, ignored in GCS_Mavlink)
-                     0, 0)  # yaw, yaw_rate (not supported yet, ignored in GCS_Mavlink)
+        self.mav.mav.send(
+            mavutil.mavlink.MAVLink_set_position_target_local_ned_message(10, self.target_system,
+                                                                          self.target_component,
+                                                                          mavutil.mavlink.MAV_FRAME_LOCAL_NED,
+                                                                          int(0b010111111000),
+                                                                          north,
+                                                                          east,
+                                                                          down,
+                                                                          0, 0, 0, 0, 0, 0, 1.57, 0.5))
+        self.progress("Ran command")
+        # self.wait_ned_location(north, east, down)
+        time.sleep(1)
         # self.mav.SET_POSITION_TARGET_LOCAL_NED(
 
+    def wait_ned_location(self,
+                          loc,
+                          accuracy=5.0,
+                          timeout=30,
+                          target_altitude=None,
+                          height_accuracy=-1,
+                          **kwargs):
+        """Wait for arrival at a location."""
+
+        def get_distance_to_loc():
+            return self.get_distance(self.mav.location(), loc)
+
+        def validator(value2, empty=None):
+            if value2 <= accuracy:
+                if target_altitude is not None:
+                    height_delta = math.fabs(self.mav.location().alt - target_altitude)
+                    if height_accuracy != -1 and height_delta > height_accuracy:
+                        return False
+                return True
+            else:
+                return False
+
+        debug_text = "Distance to Location (%.4f, %.4f) " % (loc.lat, loc.lng)
+        if target_altitude is not None:
+            debug_text += ",at altitude %.1f height_accuracy=%.1f, d" % (target_altitude, height_accuracy)
+        self.wait_and_maintain(value_name=debug_text, target=0, current_value_getter=lambda: get_distance_to_loc(),
+                               accuracy=accuracy, validator=lambda value2, target2: validator(value2, None),
+                               timeout=timeout, **kwargs)
 
     def user_takeoff(self, alt_min=30):
         """takeoff using mavlink takeoff command"""
@@ -1527,6 +1558,7 @@ def big_print(text):
     print("########## %s  ##########" % text)
     print("##################################################################################")
 
+
 coordinates = [[-0.10090299999999999, -0.15942, -0.235286],
                [-0.10074000000000001, -0.158939, -0.333386], [-0.09995400000000002, -0.15749700000000003, -0.431479],
                [-0.09825999999999997, -0.15498299999999995, -0.529555],
@@ -1576,7 +1608,7 @@ def main():
 
     big_print("Let's connect")
     # Assume that we are connecting to SITL on udp 14550
-    copter.connect()
+    copter.connect("udpin:0.0.0.0:14551")
 
     big_print("Let's wait ready to arm")
     # We wait that can pass all arming check
@@ -1593,12 +1625,11 @@ def main():
     print("MAVLINK_MSG_ID_POSITION_TARGET_GLOBAL_INT rate : %f" % copter.send_get_message_interval(
         ardupilotmega.MAVLINK_MSG_ID_POSITION_TARGET_GLOBAL_INT))
 
-    # big_print("Let's create and write a mission")
     # We will write manually a mission by defining some waypoint
     # We start by initialising mavwp helper library
     # copter.init_wp()
     # We get the home position to serve as reference for the mission and as waypoint 0.
-    last_home = copter.home_position_as_mav_location()
+    # last_home = copter.home_position_as_mav_location()
     # On Copter, we need a takeoff ... for takeoff !
 
     # copter.add_wp_takeoff(last_home.lat, last_home.lng, coordinates[0][2])
@@ -1638,23 +1669,30 @@ def main():
     # copter.wait_waypoint(0, wp_count - 1, timeout=500)
     # copter.wait_landed_and_disarmed(min_alt=2)
 
-    # big_print("Let's do some GUIDED movement")
-    # # We will do some guided command
-    # copter.change_mode("GUIDED")
-    # copter.wait_ready_to_arm()
-    # if not copter.armed():
-    #     copter.arm_vehicle()
-    # # example of mavlink takeoff
-    # copter.user_takeoff(11)
-    # # example of waiting altitude target
-    # copter.wait_altitude(10, 13, True)
-    # # Now we will use a target setpoint
-    # targetpos = copter.mav.location()
+    big_print("Let's do some GUIDED movement")
+    # We will do some guided command
+    copter.change_mode("GUIDED")
+    copter.wait_ready_to_arm()
+    if not copter.armed():
+        copter.arm_vehicle()
+    copter.user_takeoff(1)
+    copter.wait_altitude(0.1, 1, True)
+
+    targetpos = copter.mav.location()
+    print("Target Position: ", targetpos)
     # wp_accuracy = copter.get_parameter("WPNAV_RADIUS", attempts=2)
     # wp_accuracy = wp_accuracy * 0.01  # cm to m
-    # targetpos.lat = targetpos.lat + 0.001
-    # targetpos.lng = targetpos.lng + 0.001
-    # targetpos.alt = targetpos.alt + 5
+
+    for coord in coordinates:
+        # targetpos.lat = targetpos.lat + 0.001
+        # targetpos.lng = targetpos.lng + 0.001
+        # targetpos.alt = targetpos.alt + 5
+        copter.move_ned(coord[0], coord[1], coord[2])
+        # while current_target.lat != targetpos.lat and current_target.lng != targetpos.lng and current_target.alt != targetpos.alt:
+        #     current_target = copter.get_current_target()
+
+    # targetpos = copter.mav.location()
+
     # copter.mav.mav.set_position_target_global_int_send(
     #     0,  # timestamp
     #     copter.target_system,  # target system_id
@@ -1683,8 +1721,7 @@ def main():
     # )
     # # Let's control that we are going to the right place
     # current_target = copter.get_current_target()
-    # while current_target.lat != targetpos.lat and current_target.lng != targetpos.lng and current_target.alt != targetpos.alt:
-    #     current_target = copter.get_current_target()
+
     #
     # # Monitor that we are going to the right place
     # copter.wait_location(targetpos, accuracy=wp_accuracy, timeout=60,
