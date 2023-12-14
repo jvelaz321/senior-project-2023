@@ -70,8 +70,8 @@ def convert_to_distance_vectors(position_data):
 
         # Calculate the differences between consecutive coordinates
         difference = end - start
-        difference[-1] = -difference[-1]
-        difference = difference * 100
+        difference[-1] = -difference[-1]/6
+        difference = difference * 1000
         ned_coords.append(difference.tolist())
 
     return ned_coords
