@@ -74,10 +74,17 @@ echo 'export GZ_SIM_SYSTEM_PLUGIN_PATH=$HOME/gz_ws/src/ardupilot_gazebo/build:${
 echo 'export GZ_SIM_RESOURCE_PATH=$HOME/gz_ws/src/ardupilot_gazebo/models:$HOME/gz_ws/src/ardupilot_gazebo/worlds:${GZ_SIM_RESOURCE_PATH}' >> ~/.bashrc
 ```
 
+Move obstacle model to Gazebo Resource Directory
+```shell
+cp models/obstacle ~/gz_ws/src/ardupilot_gazebo/models/
+```
+
+#### Alternatively, try appending the repo path to GZ_SIM_RESOURCE_PATH
+
 Terminal 1
 ```shell
 cd worlds
-gz sim -v4 -r drone_with_lidar.sdf 
+gz sim -v4 -r drone_with_obstacle.sdf 
 ```
 Terminal 2
 ```shell
