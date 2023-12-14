@@ -90,3 +90,6 @@ Terminal 2
 ```shell
 sim_vehicle.py -v ArduCopter -f gazebo-iris --model JSON --map --console
 ```
+
+## Acknowledment
+Thanks to [Pierre Kancir](https://github.com/sponsors/khancyr) for the copter class used in the main script.
